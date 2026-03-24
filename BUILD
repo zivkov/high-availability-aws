@@ -90,7 +90,6 @@ java_library(
         #"high-availability-plugin",
         "//plugins/high-availability",
         "//plugins/global-refdb",
-        "global-refdb-neverlink",
         "high-availability-aws__plugin",
         "aws-client",
         "@docker-java-api//jar",
@@ -99,7 +98,6 @@ java_library(
         "@duct-tape//jar",
         "@jackson-annotations//jar",
         "@testcontainers//jar",
-        "@testcontainers-gcloud//jar",
         "@testcontainers-aws-localstack//jar",
 
     ],
