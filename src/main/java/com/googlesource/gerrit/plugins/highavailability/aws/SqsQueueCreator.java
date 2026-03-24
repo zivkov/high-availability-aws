@@ -14,7 +14,6 @@
 
 package com.googlesource.gerrit.plugins.highavailability.aws;
 
-import com.googlesource.gerrit.plugins.highavailability.aws.Configuration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.flogger.FluentLogger;
 import com.google.gerrit.server.config.GerritInstanceId;
@@ -56,7 +55,7 @@ public class SqsQueueCreator {
   public SqsQueueInfo create(String queueName, String topicArn)
       throws InterruptedException, ExecutionException {
     SqsQueueInfo queueInfo = createQueue(queueName);
-    initializeDQL(queueInfo);
+    initializeDLQ(queueInfo);
     initializeSubscription(queueInfo, topicArn);
 
     return queueInfo;
@@ -79,7 +78,7 @@ public class SqsQueueCreator {
     return new SqsQueueInfo(queueName, queueUrl, queueArn);
   }
 
-  private void initializeDQL(SqsQueueInfo sourceQueue)
+  private void initializeDLQ(SqsQueueInfo sourceQueue)
       throws InterruptedException, ExecutionException {
     SqsQueueInfo dlqInfo = createDlq(sourceQueue);
     int maxReceiveCount = config.retry().maxReceiveCount();
