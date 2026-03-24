@@ -19,6 +19,7 @@ import com.ericsson.gerrit.plugins.highavailability.forwarder.commands.CommandPr
 import com.ericsson.gerrit.plugins.highavailability.forwarder.commands.CommandsGson;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.flogger.FluentLogger;
+import com.google.gerrit.extensions.registration.DynamicItem;
 import com.google.gerrit.server.config.GerritInstanceId;
 import com.google.gson.Gson;
 import com.google.inject.assistedinject.Assisted;
@@ -40,7 +41,7 @@ public class SqsMessagePoller {
   private final SqsQueueInfo queueInfo;
   private final Gson gson;
   private final ExecutorService executor;
-  private final CommandProcessor processor;
+  private final DynamicItem<CommandProcessor> processor;
   private final String instanceId;
   private final Configuration config;
 
@@ -52,7 +53,7 @@ public class SqsMessagePoller {
       SqsAsyncClient sqs,
       @CommandsGson Gson gson,
       @MessageProcessingExecutor ExecutorService executor,
-      CommandProcessor processor,
+      DynamicItem<CommandProcessor> processor,
       Configuration config,
       @GerritInstanceId String instanceId,
       @Assisted SqsQueueInfo queueInfo) {
@@ -112,7 +113,7 @@ public class SqsMessagePoller {
       return;
     }
     logger.atInfo().log("Processing SQS message: %s", msg);
-    if (processor.handle(getCommand(msg))) {
+    if (processor.get().handle(getCommand(msg))) {
       // Delete message, it was processed successfully
       logger.atFine().log("Deleting SQS message: %s", msg);
       sqs.deleteMessage(req -> req.queueUrl(queueInfo.url()).receiptHandle(msg.receiptHandle()));
