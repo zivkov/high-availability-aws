@@ -40,9 +40,9 @@ The example values given here are also the default values:
   streamEvents = stream-events
 [aws "limits"]
   visibilityTimeout = 2s
-  waittime = 20s
+  waitTime = 20s
   maxNumberOfMessages = 10
-  messageProcessingThreadPoolSize = 3
+  messageProcessingThreadPoolSize = 4
 [aws "retry"]
   maxReceiveCount = 5
 ```
