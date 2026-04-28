@@ -16,14 +16,10 @@ package com.googlesource.gerrit.plugins.highavailability.aws;
 
 import static org.mockito.Mockito.mock;
 
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
+import com.ericsson.gerrit.plugins.highavailability.ApiModule;
 import com.ericsson.gerrit.plugins.highavailability.forwarder.commands.CommandProcessor;
 import com.ericsson.gerrit.plugins.highavailability.forwarder.commands.CommandsGson;
-import com.ericsson.gerrit.plugins.highavailability.forwarder.commands.ForwarderCommandsModule;
+import com.google.gerrit.extensions.registration.DynamicItem;
 import com.google.gerrit.server.config.GerritInstanceId;
 import com.google.gerrit.server.events.EventGson;
 import com.google.gerrit.server.events.EventGsonProvider;
@@ -42,7 +38,11 @@ import com.googlesource.gerrit.plugins.highavailability.aws.Configuration.Identi
 import com.googlesource.gerrit.plugins.highavailability.aws.Configuration.Limits;
 import com.googlesource.gerrit.plugins.highavailability.aws.Configuration.Retry;
 import com.googlesource.gerrit.plugins.highavailability.aws.Configuration.Topics;
-
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import org.junit.Ignore;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.crt.AwsCrtHttpClient;
@@ -52,7 +52,8 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-class TestApp {
+@Ignore
+public class TestApp {
   private static final int MAX_RECEIVE_COUNT = 3;
 
   final String instanceId;
@@ -78,23 +79,27 @@ class TestApp {
   }
 
   void start() {
-    Configuration cfg = new Configuration(
-        new Identity(testSystem.getRegion(), Path.of(testSystem.getAccessKeyLocation()), Path.of(testSystem.getSecretKeyLocation())),
-        new Topics(testSystem.getDefaultTopicName(), testSystem.getStreamEventsTopicName()),
-        new Limits(Duration.ofSeconds(2), Duration.ofSeconds(1), 10, 2),
-        new Retry(MAX_RECEIVE_COUNT));
+    Configuration cfg =
+        new Configuration(
+            new Identity(
+                testSystem.getRegion(),
+                Path.of(testSystem.getAccessKeyLocation()),
+                Path.of(testSystem.getSecretKeyLocation())),
+            new Topics(testSystem.getDefaultTopicName(), testSystem.getStreamEventsTopicName()),
+            new Limits(Duration.ofSeconds(2), Duration.ofSeconds(1), 10, 2),
+            new Retry(MAX_RECEIVE_COUNT));
 
     Module testSupportModule =
         new AbstractModule() {
           @Override
           protected void configure() {
             bind(Configuration.class).toInstance(cfg);
-            install(new ForwarderCommandsModule());
+            install(new ApiModule());
             bind(Gson.class)
                 .annotatedWith(EventGson.class)
                 .toInstance(new EventGsonProvider().get());
             bind(String.class).annotatedWith(GerritInstanceId.class).toInstance(instanceId);
-            bind(CommandProcessor.class).toInstance(cmdProcessor);
+            DynamicItem.bind(binder(), CommandProcessor.class).toInstance(cmdProcessor);
           }
 
           @Provides

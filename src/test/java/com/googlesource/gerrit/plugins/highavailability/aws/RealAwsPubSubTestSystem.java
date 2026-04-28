@@ -16,7 +16,9 @@ package com.googlesource.gerrit.plugins.highavailability.aws;
 
 import com.google.common.base.Strings;
 import java.net.URI;
+import org.junit.Ignore;
 
+@Ignore
 public class RealAwsPubSubTestSystem extends AwsPubSubTestSystem {
 
   private final String region;

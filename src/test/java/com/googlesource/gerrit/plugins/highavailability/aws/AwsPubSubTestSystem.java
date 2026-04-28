@@ -15,7 +15,9 @@
 package com.googlesource.gerrit.plugins.highavailability.aws;
 
 import java.net.URI;
+import org.junit.Ignore;
 
+@Ignore
 public abstract class AwsPubSubTestSystem {
 
   public static AwsPubSubTestSystem create() {

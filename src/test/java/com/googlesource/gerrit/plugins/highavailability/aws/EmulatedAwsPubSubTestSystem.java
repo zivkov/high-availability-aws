@@ -15,9 +15,11 @@
 package com.googlesource.gerrit.plugins.highavailability.aws;
 
 import java.net.URI;
+import org.junit.Ignore;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 
+@Ignore
 public class EmulatedAwsPubSubTestSystem extends AwsPubSubTestSystem {
   private static final DockerImageName LOCALSTACK_IMAGE =
       DockerImageName.parse("localstack/localstack:3.0.2");
